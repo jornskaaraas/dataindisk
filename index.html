@@ -5,150 +5,144 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>DataIndisk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="theme-color" content="#110c05">
+<meta name="theme-color" content="#1d2a78">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="DataIndisk">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=VT323&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Pixelify+Sans:wght@500;700&display=swap">
 <style>
-/* Layout: én kolonne terminalvindu, sticky statuslinje + fanerad, innhold som utskrift/skjerm.
-   Lys = grønnstripet skriverpapir (fanfold). Mørk = VT220 amber-fosfor. */
+/* Layout: én kolonne med 16-bit RPG-menybokser (firkantede kanter, harde skygger).
+   Pikselfont kun i titler og tall; brødtekst i en svært lesbar sans. */
 :root{
-  --bg:#f3f2e8; --panel:#fbfaf3; --bar:#e1ebd6; --ink:#1d2822; --dim:#5c6a61; --line:#c9d3c0;
-  --accent:#0e6a4c; --hot:#b3361b; --ok:#2f7d32; --glow:transparent; --scan:transparent; --hole:#d8d6c8;
-  --f-display:"VT323","Courier New",monospace;
-  --f-body:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  --bg:#dfe8fb; --panel:#ffffff; --alt:#eef3ff; --ink:#1a1f3d; --dim:#56607e; --edge:#1a1f3d; --shadow:#9fb0d9;
+  --accent:#3451c7; --hot:#e0560b; --ok:#2b8a3e; --gold:#e8a700; --seg:#d5ddf2;
+  --f-pixel:"Pixelify Sans","Courier New",monospace;
+  --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#110c05; --panel:#17110a; --bar:#1d150b; --ink:#ffb547; --dim:#a8762f; --line:#3a2a14;
-  --accent:#ffd27a; --hot:#ff6a3d; --ok:#c8e07a; --glow:rgba(255,170,60,.35); --scan:rgba(0,0,0,.22); --hole:#0b0803;
-  color-scheme:dark }}
+  --bg:#0e1330; --panel:#1d2a78; --alt:#17226a; --ink:#ffffff; --dim:#c3cbf2; --edge:#eef1ff; --shadow:#050820;
+  --accent:#9db6ff; --hot:#ffa04d; --ok:#8ce99a; --gold:#ffd43b; --seg:#2c3a8f; color-scheme:dark }}
 :root[data-theme="dark"]{
-  --bg:#110c05; --panel:#17110a; --bar:#1d150b; --ink:#ffb547; --dim:#a8762f; --line:#3a2a14;
-  --accent:#ffd27a; --hot:#ff6a3d; --ok:#c8e07a; --glow:rgba(255,170,60,.35); --scan:rgba(0,0,0,.22); --hole:#0b0803;
-  color-scheme:dark }
+  --bg:#0e1330; --panel:#1d2a78; --alt:#17226a; --ink:#ffffff; --dim:#c3cbf2; --edge:#eef1ff; --shadow:#050820;
+  --accent:#9db6ff; --hot:#ffa04d; --ok:#8ce99a; --gold:#ffd43b; --seg:#2c3a8f; color-scheme:dark }
 
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5;
-  text-shadow:0 0 6px var(--glow);-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
-body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;
-  background:repeating-linear-gradient(to bottom,transparent 0 2px,var(--scan) 2px 3px)}
-.wrap{max-width:880px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:820px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 a{color:var(--accent)}
 button,input,select,textarea{font:inherit;color:inherit}
-:focus-visible{outline:2px dashed var(--accent);outline-offset:2px}
-
-/* topp */
-.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
-.top .wrap{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 16px;padding-block:10px 6px}
-.brand{display:flex;align-items:baseline;gap:10px;min-width:0}
-.prompt{color:var(--dim);font-size:12px}
-h1{font-family:var(--f-display);font-weight:400;font-size:34px;line-height:1;margin:0;letter-spacing:.02em}
-h1 .cur{display:inline-block;width:.5em;background:var(--ink);animation:blink 1.1s steps(1) infinite;margin-left:2px}
-@keyframes blink{50%{opacity:0}}
-.status{font-size:11px;color:var(--dim);letter-spacing:.06em;text-transform:uppercase}
-.tabs{display:flex;gap:2px;overflow-x:auto;padding-block:0 0;scrollbar-width:none}
-.tabs::-webkit-scrollbar{display:none}
-.tab{background:none;border:1px solid transparent;border-bottom:none;padding:6px 12px;cursor:pointer;color:var(--dim);white-space:nowrap;font-size:13px}
-.tab kbd{font-family:inherit;opacity:.7}
-.tab[aria-selected="true"]{color:var(--ink);border-color:var(--line);background:var(--panel);position:relative;top:1px}
-.tab:hover{color:var(--ink)}
-
-main{padding-block:20px 64px}
-section{display:grid;gap:18px}
-.label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
-.sql{font-size:12px;color:var(--dim);overflow-x:auto;white-space:pre;padding:2px 0}
-.sql b{color:var(--accent);font-weight:500}
-h2{font-family:var(--f-display);font-weight:400;font-size:26px;line-height:1.1;margin:0;text-wrap:balance}
+:focus-visible{outline:3px solid var(--hot);outline-offset:2px}
+h1,h2,.pix{font-family:var(--f-pixel);font-weight:700;letter-spacing:.01em}
+h1{font-size:28px;line-height:1;margin:0}
+h2{font-size:24px;line-height:1.15;margin:0;text-wrap:balance}
 p{margin:0}
 .muted{color:var(--dim)}
-.box{border:1px solid var(--line);background:var(--panel);padding:16px}
-.btn{border:1px solid var(--ink);background:transparent;padding:7px 12px;cursor:pointer;font-size:13px}
-.btn:hover{background:var(--ink);color:var(--bg);text-shadow:none}
-.btn.pri{background:var(--ink);color:var(--bg);text-shadow:none}
-.btn.pri:hover{background:var(--accent);border-color:var(--accent)}
-.btn.ghost{border-color:var(--line);color:var(--dim)}
-.btns{display:flex;flex-wrap:wrap;gap:8px}
+.small{font-size:14px}
 .tnum{font-variant-numeric:tabular-nums}
+.label{font-family:var(--f-pixel);font-size:14px;font-weight:500;color:var(--dim)}
 
-/* neste-kort */
-.next{border:1px solid var(--hot);padding:16px;display:grid;gap:10px;background:var(--panel);position:relative}
-.next .tag{color:var(--hot);font-size:12px;letter-spacing:.12em}
-.next h2{font-size:38px}
-.kv{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:13px}
-.kv span b{font-weight:500}
+/* RPG-vindu */
+.win{background:var(--panel);border:3px solid var(--edge);box-shadow:4px 4px 0 var(--shadow);padding:16px}
 
-/* liste: grønnstripet utskrift */
-.list{border:1px solid var(--line);position:relative}
-.row{display:grid;grid-template-columns:3.2ch minmax(0,1fr) auto;gap:4px 12px;padding:8px 12px;align-items:baseline;cursor:pointer}
-.row:nth-child(odd){background:var(--bar)}
-.row:hover{outline:1px solid var(--accent);outline-offset:-1px}
-.row .rk{color:var(--dim)}
-.row .nm{font-weight:500;min-width:0}
-.row .meta{font-size:12px;color:var(--dim);min-width:0}
-.row .sc{text-align:right;font-size:13px}
-.row .blk{grid-column:2/4;font-size:12px;letter-spacing:-.04em;color:var(--accent);white-space:nowrap;overflow:hidden}
-.row.visited .nm{text-decoration:line-through;text-decoration-color:var(--dim)}
+/* topp */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:12px 0}
+.head{display:flex;align-items:center;gap:12px;padding-block:0 10px}
+.head svg{width:40px;height:34px;flex:none;image-rendering:pixelated}
+.head .sub{font-size:13px;color:var(--dim)}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:0 4px 10px 0;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{font-family:var(--f-pixel);font-weight:500;font-size:15px;background:var(--panel);border:3px solid var(--edge);padding:5px 12px;cursor:pointer;white-space:nowrap;box-shadow:3px 3px 0 var(--shadow)}
+.tab[aria-selected="true"]{background:var(--edge);color:var(--panel)}
+.tab[aria-selected="true"]::before{content:"▶ ";font-size:11px}
+.tab:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--shadow)}
+
+main{padding-block:12px 64px}
+section{display:grid;gap:20px}
+
+.btn{font-family:var(--f-pixel);font-weight:500;font-size:15px;border:3px solid var(--edge);background:var(--panel);padding:7px 14px;cursor:pointer;box-shadow:3px 3px 0 var(--shadow);text-decoration:none;color:var(--ink);display:inline-block}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--shadow)}
+.btn.pri{background:var(--hot);color:#fff;border-color:var(--edge)}
+.btn.quiet{border-color:var(--dim);color:var(--dim);box-shadow:none}
+.btns{display:flex;flex-wrap:wrap;gap:10px}
+
+/* neste */
+.next{display:grid;gap:12px;border-color:var(--hot)}
+.next .tag{font-family:var(--f-pixel);color:var(--hot);font-size:15px}
+.next h2{font-size:30px}
+.facts{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:15px}
+.facts b{font-weight:700}
+
+/* liste */
+.list{border:3px solid var(--edge);box-shadow:4px 4px 0 var(--shadow);background:var(--panel)}
+.row{display:grid;grid-template-columns:2.4em minmax(0,1fr) auto;gap:2px 12px;padding:10px 14px;align-items:center;cursor:pointer}
+.row:nth-child(even){background:var(--alt)}
+.row:hover .nm{color:var(--accent)}
+.row .rk{font-family:var(--f-pixel);font-size:18px;color:var(--dim)}
+.row .nm{font-weight:700;min-width:0}
+.row .meta{font-size:13px;color:var(--dim);font-weight:400}
+.row .sc{text-align:right;display:grid;gap:4px;justify-items:end}
+.row .star{font-family:var(--f-pixel);font-size:16px}
+.row .star span{color:var(--gold)}
+.row.visited .nm{color:var(--dim)}
 .row.skipped{opacity:.5}
-.pill{display:inline-block;border:1px solid currentColor;padding:0 5px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;margin-left:6px;vertical-align:1px}
-.pill.ok{color:var(--ok)} .pill.warn{color:var(--hot)} .pill.mo{color:var(--accent)}
-.toolbar{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;font-size:12px}
-.toolbar label{display:flex;gap:6px;align-items:center;cursor:pointer}
-details summary{cursor:pointer;color:var(--dim);font-size:12px}
-pre.code{margin:10px 0 0;font-size:12px;overflow-x:auto;white-space:pre;color:var(--ink)}
+.segs{display:flex;gap:2px}
+.segs i{width:7px;height:9px;background:var(--seg)}
+.segs i.on{background:var(--ok)}
+.chip{display:inline-block;font-size:11px;font-weight:700;padding:0 6px;margin-left:6px;border:2px solid currentColor;vertical-align:2px;line-height:1.5}
+.chip.ok{color:var(--ok)} .chip.warn{color:var(--hot)} .chip.us{color:var(--accent)}
+.filters{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-size:14px}
+.filters label{display:flex;gap:6px;align-items:center;cursor:pointer}
+input[type=checkbox]{accent-color:var(--hot);width:16px;height:16px}
+details summary{cursor:pointer;font-weight:700}
+.formula{font-family:var(--f-pixel);font-size:15px;margin:12px 0;overflow-x:auto;white-space:pre}
 
 /* kart */
-.mapwrap{border:1px solid var(--line);background:var(--panel);overflow:hidden}
-svg.map{display:block;width:100%;height:auto}
-.map text{font-family:var(--f-body);fill:var(--dim);font-size:9px}
-.map .grid{stroke:var(--line);stroke-width:.6}
-.map .lm{stroke:var(--dim);stroke-width:1}
-.map .lmt{fill:var(--dim);font-size:9px;font-style:italic}
+.mapwrap{border:3px solid var(--edge);box-shadow:4px 4px 0 var(--shadow);background:var(--panel);overflow:hidden}
+svg.map{display:block;width:100%;height:auto;shape-rendering:crispEdges}
+.map text{font-family:var(--f-body);fill:var(--dim);font-size:10px}
+.map .grid{stroke:var(--seg);stroke-width:1}
+.map .lm{fill:var(--dim)}
+.map .lmt{fill:var(--dim);font-size:10px}
 .map .pt{cursor:pointer}
-.map .pt circle{fill:var(--ink);stroke:var(--bg);stroke-width:1.5}
-.map .pt.approx circle{fill:var(--bg);stroke:var(--ink);stroke-width:1.5;stroke-dasharray:2 1.5}
-.map .pt.visited circle{fill:var(--dim)}
-.map .pt.next circle{fill:var(--hot)}
-.map .pt text{fill:var(--ink);font-size:10px;font-weight:600}
-.map .pt.sel circle{stroke:var(--accent);stroke-width:3}
-.map .ring{fill:none;stroke:var(--hot);stroke-width:1.2;animation:pulse 1.8s ease-out infinite;transform-box:fill-box;transform-origin:center}
-@keyframes pulse{from{transform:scale(1);opacity:.9}to{transform:scale(3.2);opacity:0}}
-.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:11px;color:var(--dim)}
-.legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:-1px;background:var(--ink)}
-.legend i.a{background:transparent;border:1.5px dashed var(--ink)} .legend i.n{background:var(--hot)} .legend i.v{background:var(--dim)}
+.map .pt rect.d{fill:var(--accent);stroke:var(--edge);stroke-width:1.5}
+.map .pt.approx rect.d{fill:var(--panel);stroke:var(--accent);stroke-width:2;stroke-dasharray:3 2}
+.map .pt.visited rect.d{fill:var(--dim)}
+.map .pt.next rect.d{fill:var(--hot)}
+.map .pt.sel rect.d{stroke:var(--hot);stroke-width:3}
+.map .pt text{fill:var(--ink);font-family:var(--f-pixel);font-size:12px;font-weight:700}
+.map .ring{fill:none;stroke:var(--hot);stroke-width:2;animation:pulse 1.6s steps(4) infinite;transform-box:fill-box;transform-origin:center}
+@keyframes pulse{from{transform:scale(1);opacity:1}to{transform:scale(2.6);opacity:0}}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--dim)}
+.legend i{display:inline-block;width:11px;height:11px;margin-right:6px;vertical-align:-1px;background:var(--accent);border:1.5px solid var(--edge)}
+.legend i.a{background:var(--panel);border:2px dashed var(--accent)} .legend i.n{background:var(--hot)} .legend i.v{background:var(--dim)}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{font-family:var(--f-pixel);font-weight:500;font-size:15px;border:3px solid var(--edge);background:var(--panel);padding:5px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--edge);color:var(--panel)}
 
 /* rate */
-.person{display:grid;grid-template-columns:minmax(0,1fr) 4ch;gap:4px 12px;align-items:center}
-.person .big{font-family:var(--f-display);font-size:40px;line-height:1;text-align:right}
-input[type=range]{width:100%;accent-color:var(--ink)}
-.field{display:grid;gap:4px}
-.field input,.field select,.field textarea{background:var(--bg);border:1px solid var(--line);padding:7px 9px;width:100%;min-width:0}
-.seg{display:flex;flex-wrap:wrap;gap:0}
-.seg button{border:1px solid var(--line);background:var(--bg);padding:6px 10px;cursor:pointer;margin-right:-1px}
-.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink);text-shadow:none}
-.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;font-size:13px;z-index:60;text-shadow:none}
+.person{display:grid;grid-template-columns:minmax(0,1fr) 3ch;gap:4px 14px;align-items:center}
+.person .big{font-family:var(--f-pixel);font-size:40px;line-height:1;text-align:right;color:var(--hot)}
+.person label{font-family:var(--f-pixel);font-size:18px;font-weight:700;color:var(--ink)}
+input[type=range]{width:100%;accent-color:var(--hot);height:28px}
+.field{display:grid;gap:6px}
+.field input,.field select,.field textarea{background:var(--panel);border:3px solid var(--edge);padding:8px 10px;width:100%;min-width:0}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--edge);color:var(--panel);font-family:var(--f-pixel);padding:10px 16px;z-index:60;box-shadow:4px 4px 0 var(--shadow);max-width:calc(100vw - 32px)}
 
 /* logg */
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
-.stat{background:var(--panel);padding:12px}
-.stat .v{font-family:var(--f-display);font-size:36px;line-height:1}
-.visit{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:10px 12px;border-top:1px dashed var(--line)}
-.visit:first-child{border-top:none}
-.visit .avg{font-family:var(--f-display);font-size:32px;line-height:1;text-align:right}
-textarea.code{font-size:11px;height:90px;resize:vertical}
-.empty{padding:20px;text-align:center;color:var(--dim);border:1px dashed var(--line)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.stat .v{font-family:var(--f-pixel);font-size:34px;line-height:1.1;font-weight:700}
+.visit{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 14px;padding:12px 14px}
+.visit:nth-child(even){background:var(--alt)}
+.visit .avg{font-family:var(--f-pixel);font-size:32px;line-height:1;text-align:right;color:var(--hot)}
+textarea.code{font-size:12px;height:90px;resize:vertical}
+.empty{padding:22px;text-align:center;color:var(--dim)}
 
-@media (min-width:900px){
-  .list::before,.list::after{content:"";position:absolute;top:0;bottom:0;width:14px;
-    background:radial-gradient(circle at 50% 50%,var(--hole) 3.5px,transparent 4px) 0 4px/14px 18px repeat-y}
-  .list::before{left:-24px} .list::after{right:-24px}
-}
-@media (max-width:520px){ .next h2{font-size:30px} h1{font-size:30px} .prompt{display:none} }
+@media (max-width:520px){ .next h2{font-size:26px} .head .sub{display:none} }
 @media (prefers-reduced-motion:reduce){ *{animation:none!important} }
 
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}
@@ -159,138 +153,130 @@ textarea.code{font-size:11px;height:90px;resize:vertical}
 
 <header class="top">
   <div class="wrap">
-    <div class="brand"><span class="prompt">dataindisk@oslo:~$</span><h1>DataIndisk<span class="cur">&nbsp;</span></h1></div>
-    <div class="status" id="status">CTM · medium+ · andux/trondos/jolli · 0 databaser</div>
-  </div>
-  <div class="wrap">
+    <div class="head">
+      <svg id="bowl" viewBox="0 0 12 10" aria-hidden="true"></svg>
+      <div><h1>DataIndisk</h1><div class="sub">Chicken tikka masala, medium+, én gang i måneden</div></div>
+    </div>
     <nav class="tabs" role="tablist" aria-label="Visninger">
-      <button class="tab" role="tab" data-v="ko"><kbd>1</kbd> kø</button>
-      <button class="tab" role="tab" data-v="kart"><kbd>2</kbd> kart</button>
-      <button class="tab" role="tab" data-v="rate"><kbd>3</kbd> rate</button>
-      <button class="tab" role="tab" data-v="logg"><kbd>4</kbd> logg</button>
-      <button class="tab" role="tab" data-v="sys"><kbd>5</kbd> sys</button>
+      <button class="tab" role="tab" data-v="ko">Neste</button>
+      <button class="tab" role="tab" data-v="kart">Kart</button>
+      <button class="tab" role="tab" data-v="rate">Rate</button>
+      <button class="tab" role="tab" data-v="logg">Logg</button>
+      <button class="tab" role="tab" data-v="sys">Oppsett</button>
     </nav>
   </div>
 </header>
 
 <main class="wrap">
-  <!-- KØ -->
+  <!-- NESTE -->
   <section id="v-ko" hidden>
-    <div class="next" id="nextCard"></div>
-    <div class="sql" aria-hidden="true"><b>SELECT</b> navn, ta, n, wr <b>FROM</b> oslo_indisk <b>WHERE</b> rett = 'chicken tikka masala' <b>AND</b> styrke = 'medium+' <b>ORDER BY</b> wr <b>DESC</b>;</div>
-    <div class="toolbar">
-      <label><input type="checkbox" id="fVisited" checked> vis besøkte</label>
-      <label><input type="checkbox" id="fSkipped"> vis hoppet over</label>
-      <label><input type="checkbox" id="fArea"> kun med ekstern rating</label>
+    <div class="win next" id="nextCard"></div>
+    <div class="filters">
+      <label><input type="checkbox" id="fVisited" checked> Vis besøkte</label>
+      <label><input type="checkbox" id="fSkipped"> Vis hoppet over</label>
+      <label><input type="checkbox" id="fArea"> Kun med rating</label>
       <span class="muted tnum" id="countLbl"></span>
     </div>
     <div class="list" id="list"></div>
-    <details class="box">
-      <summary>// hvordan sorteres lista? (vektet rating)</summary>
-      <p style="margin-top:10px">En restaurant med 5,0 fra 43 anmeldelser er mindre sikker enn 4,7 fra 4 238. Vi bruker derfor en bayesiansk vektet rating (samme idé som IMDb Top 250): få anmeldelser trekkes mot snittet for alle indiske restauranter i lista.</p>
-<pre class="code">WR = (n / (n + m)) · R  +  (m / (n + m)) · C
-
-R = Tripadvisor-snitt     n = antall anmeldelser
-m = 100 (tillitsterskel)  C = <span id="cVal"></span> (snitt for hele lista)</pre>
-      <p class="muted" style="margin-top:10px">Kilde: Tripadvisors liste over indiske restauranter i Oslo, hentet 21. okt 2026. Restauranter uten ekstern rating havner nederst. Når dere har vært et sted, vises deres egen score ved siden av.</p>
+    <details class="win">
+      <summary>Hvordan er lista sortert?</summary>
+      <p style="margin-top:10px">Etter Tripadvisor-rating, men justert for antall anmeldelser. Et sted med 5,0 fra 43 anmeldelser er mindre sikkert enn 4,7 fra over 4 000, så få anmeldelser trekkes mot snittet.</p>
+      <div class="formula">poeng = (n/(n+100))·R + (100/(n+100))·<span id="cVal"></span></div>
+      <p class="muted small">R er ratingen, n er antall anmeldelser og <span id="cVal2"></span> er snittet for hele lista. Kilde: Tripadvisor, hentet 21. oktober 2026. Steder uten rating ligger nederst. Søylen viser poengsummen.</p>
     </details>
   </section>
 
   <!-- KART -->
   <section id="v-kart" hidden>
-    <div class="toolbar">
+    <div class="filters">
       <div class="seg" id="zoomSeg">
-        <button type="button" data-z="sentrum" aria-pressed="true">sentrum</button>
-        <button type="button" data-z="stor">stor-oslo</button>
+        <button type="button" data-z="sentrum" aria-pressed="true">Sentrum</button>
+        <button type="button" data-z="stor">Stor-Oslo</button>
       </div>
-      <span class="muted">klikk et punkt for detaljer · tall = plass i køen</span>
+      <span class="muted">Trykk på et punkt. Tallet er plassen i køen.</span>
     </div>
-    <div class="mapwrap"><svg class="map" id="map" role="img" aria-label="Kart over restaurantene plottet etter koordinater"></svg></div>
-    <div class="legend"><span><i></i>presis adresse</span><span><i class="a"></i>omtrentlig (bydel)</span><span><i class="n"></i>neste besøk</span><span><i class="v"></i>besøkt</span></div>
-    <div class="box" id="mapInfo"><p class="muted">// velg et punkt i kartet</p></div>
+    <div class="mapwrap"><svg class="map" id="map" role="img" aria-label="Kart over restaurantene"></svg></div>
+    <div class="legend"><span><i></i>Presis adresse</span><span><i class="a"></i>Omtrentlig (bydel)</span><span><i class="n"></i>Neste besøk</span><span><i class="v"></i>Besøkt</span></div>
+    <div class="win" id="mapInfo"><p class="muted">Velg et punkt i kartet.</p></div>
     <div>
-      <div class="label" style="margin-bottom:6px">ikke plottet, mangler adresse</div>
-      <div class="muted" id="unplotted" style="font-size:12px"></div>
+      <div class="label" style="margin-bottom:6px">Mangler adresse, ikke på kartet</div>
+      <div class="small" id="unplotted"></div>
     </div>
   </section>
 
   <!-- RATE -->
   <section id="v-rate" hidden>
-    <div>
-      <div class="label">ny commit</div>
-      <h2>Rate besøket</h2>
+    <h2>Rate besøket</h2>
+    <div class="grid2">
+      <div class="field"><label class="label" for="rRest">Restaurant</label><select id="rRest"></select></div>
+      <div class="field"><label class="label" for="rDate">Dato</label><input type="date" id="rDate"></div>
     </div>
-    <form id="rateForm" class="grid2" autocomplete="off">
-      <div class="field"><label class="label" for="rRest">restaurant</label><select id="rRest"></select></div>
-      <div class="field"><label class="label" for="rDate">dato</label><input type="date" id="rDate"></div>
-    </form>
-    <div class="box" style="display:grid;gap:16px">
-      <div class="label">chicken tikka masala, 1–10 per person</div>
-      <div id="persons" style="display:grid;gap:14px"></div>
+    <div class="win" style="display:grid;gap:18px">
+      <div class="label">Chicken tikka masala, 1–10</div>
+      <div id="persons" style="display:grid;gap:16px"></div>
     </div>
     <div class="grid2">
       <div class="field">
-        <span class="label">styrke vs. bestilt medium+</span>
+        <span class="label">Traff de medium+?</span>
         <div class="seg" id="heatSeg">
-          <button type="button" data-h="mild">for mild</button>
-          <button type="button" data-h="ok" aria-pressed="true">traff</button>
-          <button type="button" data-h="hot">for sterk</button>
+          <button type="button" data-h="mild">For mild</button>
+          <button type="button" data-h="ok" aria-pressed="true">Traff</button>
+          <button type="button" data-h="hot">For sterk</button>
         </div>
       </div>
       <div class="field">
-        <span class="label">naan</span>
+        <span class="label">Naan</span>
         <div class="seg" id="naanSeg">
           <button type="button" data-n="1">1</button><button type="button" data-n="2">2</button><button type="button" data-n="3" aria-pressed="true">3</button><button type="button" data-n="4">4</button><button type="button" data-n="5">5</button>
         </div>
       </div>
-      <div class="field"><label class="label" for="rPrice">pris per person (kr)</label><input type="number" id="rPrice" inputmode="numeric" min="0" step="10" placeholder="f.eks. 420"></div>
+      <div class="field"><label class="label" for="rPrice">Pris per person (kr)</label><input type="number" id="rPrice" inputmode="numeric" min="0" step="10" placeholder="420"></div>
     </div>
-    <div class="field"><label class="label" for="rNote">commit-melding</label><input id="rNote" maxlength="140" placeholder="fix: sausen manglet røyk, naan var 10/10"></div>
-    <div class="btns"><button class="btn pri" id="saveBtn" type="button">git commit -m "besøk"</button></div>
+    <div class="field"><label class="label" for="rNote">Kommentar</label><input id="rNote" maxlength="140" placeholder="Sausen var perfekt, naan litt tørr"></div>
+    <div class="btns"><button class="btn pri" id="saveBtn" type="button">Lagre besøk</button></div>
   </section>
 
   <!-- LOGG -->
   <section id="v-logg" hidden>
     <div class="stats" id="stats"></div>
     <div>
-      <div class="label" style="margin-bottom:6px">intern toppliste (vår egen score)</div>
+      <div class="label" style="margin-bottom:8px">Vår topp­liste</div>
       <div class="list" id="board"></div>
     </div>
     <div>
-      <div class="label" style="margin-bottom:6px">git log --oneline</div>
-      <div class="box" id="visits" style="padding:0"></div>
+      <div class="label" style="margin-bottom:8px">Alle besøk</div>
+      <div class="list" id="visits"></div>
     </div>
   </section>
 
-  <!-- SYS -->
+  <!-- OPPSETT -->
   <section id="v-sys" hidden>
-    <div class="box" style="display:grid;gap:12px">
-      <div class="label">brukere</div>
+    <div class="win" style="display:grid;gap:12px">
+      <h2>Spillere</h2>
       <div class="grid2" id="names"></div>
     </div>
-    <div class="box" style="display:grid;gap:12px">
-      <div class="label">synk uten database</div>
-      <p>Alt lagres lokalt i nettleseren. For å dele mellom dere tre: kopier eksportkoden og send den i gruppechatten. Den som limer inn får besøkene flettet inn (ingen duplikater).</p>
-      <div class="btns"><button class="btn" id="expBtn" type="button">kopier eksportkode</button></div>
-      <textarea class="code field" id="expOut" readonly aria-label="Eksportkode" hidden></textarea>
-      <div class="field"><label class="label" for="impIn">lim inn kode fra en kompis</label><textarea class="code" id="impIn" placeholder="DI1:..."></textarea></div>
-      <div class="btns"><button class="btn" id="impBtn" type="button">flett inn</button></div>
+    <div class="win" style="display:grid;gap:12px">
+      <h2>Del besøk</h2>
+      <p>Alt lagres på din egen telefon. For å dele: kopier koden og send den i gruppechatten. Den som limer den inn får besøkene lagt til, uten duplikater.</p>
+      <div class="btns"><button class="btn" id="expBtn" type="button">Kopier delingskode</button></div>
+      <textarea class="code field" id="expOut" readonly aria-label="Delingskode" hidden></textarea>
+      <div class="field"><label class="label" for="impIn">Lim inn kode fra en kompis</label><textarea class="code" id="impIn" placeholder="DI1:..."></textarea></div>
+      <div class="btns"><button class="btn" id="impBtn" type="button">Legg til besøk</button></div>
     </div>
-    <div class="box" style="display:grid;gap:12px">
-      <div class="label">vedlikehold</div>
+    <div class="win" style="display:grid;gap:12px">
+      <h2>Vedlikehold</h2>
       <div class="btns">
-        <button class="btn ghost" id="unskipBtn" type="button">nullstill «hopp over»</button>
-        <button class="btn ghost" id="wipeBtn" type="button">slett alle data</button>
+        <button class="btn quiet" id="unskipBtn" type="button">Angre alle «hopp over»</button>
+        <button class="btn quiet" id="wipeBtn" type="button">Slett alle besøk</button>
       </div>
     </div>
-    <p class="muted" style="font-size:12px">Ratinger: Tripadvisor (21.10.2026). Koordinater er plassert ut fra adresse og er omtrentlige; stiplede punkter er kun plassert på bydel. «CTM bekreftet» betyr at retten er funnet på meny eller i anmeldelser. Installer som app: åpne den hostede versjonen i nettleseren og velg «Legg til på startskjerm».</p>
+    <p class="muted small">Ratinger fra Tripadvisor (21.10.2026). Kartposisjoner er omtrentlige. «CTM ✓» betyr at retten er funnet på meny eller i anmeldelser.</p>
   </section>
 </main>
 
 <script>
 (()=>{
 // ---------- data ----------
-// id, navn, område, adresse, lat, lon, omtrentlig, TA-rating, antall, ctm-status
 const R = [
  ["dpg-rad","Der Peppern Gror Rådhusplassen","Sentrum","Fridtjof Nansens plass 7",59.9121,10.7334,0,4.7,4238,"bekreftet"],
  ["dpg-bog","Der Peppern Gror Bogstadveien","Majorstuen","Bogstadveien",59.9262,10.7222,1,4.8,827,"bekreftet"],
@@ -325,13 +311,13 @@ const R = [
  ["flamme","Den Indiske Flamme","Lillestrøm","Torvgata 15 A",59.9561,11.0502,1,null,null,"sannsynlig"]
 ].map(a=>({id:a[0],name:a[1],area:a[2],addr:a[3],lat:a[4],lon:a[5],approx:!!a[6],ta:a[7],n:a[8],ctm:a[9]}));
 
-const M = 100;
-const rated = R.filter(r=>r.ta!=null);
-const C = rated.reduce((s,r)=>s+r.ta,0)/rated.length;
-R.forEach(r=>{ r.wr = r.ta==null?null:(r.n/(r.n+M))*r.ta+(M/(r.n+M))*C; });
+const M=100;
+const rated=R.filter(r=>r.ta!=null);
+const C=rated.reduce((s,r)=>s+r.ta,0)/rated.length;
+R.forEach(r=>{ r.wr=r.ta==null?null:(r.n/(r.n+M))*r.ta+(M/(r.n+M))*C; });
 R.sort((a,b)=>(b.wr??-1)-(a.wr??-1));
 R.forEach((r,i)=>r.rank=i+1);
-const byId = Object.fromEntries(R.map(r=>[r.id,r]));
+const byId=Object.fromEntries(R.map(r=>[r.id,r]));
 
 // ---------- lagring ----------
 const KEY="dataindisk.v1";
@@ -351,130 +337,120 @@ const gmaps=r=>"https://www.google.com/maps/search/?api=1&query="+encodeURICompo
 const visitsFor=id=>S.visits.filter(v=>v.rid===id);
 const vAvg=v=>{const s=v.scores.filter(x=>x!=null);return s.length?s.reduce((a,b)=>a+b,0)/s.length:null;};
 const ourScore=id=>{const vs=visitsFor(id);if(!vs.length)return null;return vs.reduce((a,v)=>a+vAvg(v),0)/vs.length;};
-const blocks=w=>{if(w==null)return "░░░░░░░░░░░░░░░░ n/a";const lo=3.8,hi=4.85;const k=Math.max(0,Math.min(16,Math.round((w-lo)/(hi-lo)*16)));return "█".repeat(k)+"░".repeat(16-k)+" "+f2(w);};
-let toastT;function toast(msg){let t=$(".toast");if(!t){t=document.createElement("div");t.className="toast";t.setAttribute("role","status");document.body.appendChild(t);}t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,2200);}
+const segs=(k,total=10)=>`<span class="segs" aria-hidden="true">${Array.from({length:total},(_,i)=>`<i class="${i<k?"on":""}"></i>`).join("")}</span>`;
+const wrSegs=w=>w==null?"":segs(Math.max(1,Math.min(10,Math.round((w-3.8)/(4.85-3.8)*10))));
+let toastT;function toast(msg){let t=$(".toast");if(!t){t=document.createElement("div");t.className="toast";t.setAttribute("role","status");document.body.appendChild(t);}t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,2400);}
 
-function queue(){ // ubesøkte, ikke hoppet over, i WR-rekkefølge
-  return R.filter(r=>!visitsFor(r.id).length && !S.skipped.includes(r.id));
-}
+// pikselbolle i toppen
+(()=>{const art=["...d..d.....","..d..d......","............","..oooccooo..",".ocoooooocoo","bbbbbbbbbbbb",".bwwwwwwwwb.","..bwwwwwwb..","...bbbbbb..."];
+ const col={d:"var(--dim)",o:"var(--hot)",c:"var(--gold)",b:"var(--edge)",w:"var(--panel)"};
+ $("#bowl").innerHTML=art.map((row,y)=>[...row].map((ch,x)=>col[ch]?`<rect x="${x}" y="${y}" width="1" height="1" fill="${col[ch]}"/>`:"").join("")).join("");})();
+
+function queue(){return R.filter(r=>!visitsFor(r.id).length && !S.skipped.includes(r.id));}
 function schedule(){
   const now=new Date(); let y=now.getFullYear(), m=now.getMonth();
   const thisMonth=S.visits.some(v=>{const d=new Date(v.date);return d.getFullYear()===y&&d.getMonth()===m;});
   if(thisMonth){m++; if(m>11){m=0;y++;}}
-  const map={}; queue().forEach((r,i)=>{const mm=(m+i)%12, yy=y+Math.floor((m+i)/12); map[r.id]=MND[mm]+" "+yy;});
+  const map={}; queue().forEach((r,i)=>{map[r.id]=MND[(m+i)%12]+" "+(y+Math.floor((m+i)/12));});
   return map;
 }
-const ctmPill=r=>r.ctm==="bekreftet"?'<span class="pill ok">ctm ✓</span>':r.ctm==="usikker"?'<span class="pill warn">ctm ?</span>':"";
+const ctmChip=r=>r.ctm==="bekreftet"?'<span class="chip ok">CTM ✓</span>':r.ctm==="usikker"?'<span class="chip warn">CTM ?</span>':"";
 
-// ---------- KØ ----------
+// ---------- NESTE ----------
 function renderKo(){
   const q=queue(), sch=schedule(), nx=q[0];
-  $("#cVal").textContent=f2(C);
+  $("#cVal").textContent=f2(C); $("#cVal2").textContent=f2(C);
   if(nx){
     $("#nextCard").innerHTML=`
-      <div class="tag">&gt; NESTE_BESØK :: ${esc(sch[nx.id]).toUpperCase()}</div>
+      <div class="tag">▶ Neste besøk · ${esc(sch[nx.id])}</div>
       <h2>${esc(nx.name)}</h2>
-      <div class="kv tnum">
-        <span>adresse <b>${esc(nx.addr||"ukjent")}</b></span>
-        <span>område <b>${esc(nx.area)}</b></span>
-        <span>tripadvisor <b>${f1(nx.ta)}</b> (${nx.n??0})</span>
-        <span>WR <b>${f2(nx.wr)}</b></span>
-        <span>ctm <b>${esc(nx.ctm)}</b></span>
+      <div class="facts tnum">
+        <span>${esc(nx.addr&&nx.addr!==nx.area?nx.addr+", "+nx.area:nx.area)}</span>
+        <span><b style="color:var(--gold)">★</b> <b>${f1(nx.ta)}</b> <span class="muted">(${nx.n??0} anmeldelser)</span></span>
+        ${nx.ctm==="bekreftet"?'<span class="chip ok" style="margin:0">CTM ✓</span>':""}
       </div>
       <div class="btns">
-        <button class="btn pri" data-act="rate" data-id="${nx.id}" type="button">rate besøket</button>
-        <a class="btn" href="${gmaps(nx)}" target="_blank" rel="noopener">åpne i kart ↗</a>
-        <button class="btn ghost" data-act="skip" data-id="${nx.id}" type="button">hopp over</button>
+        <button class="btn pri" data-act="rate" data-id="${nx.id}" type="button">Rate besøket</button>
+        <a class="btn" href="${gmaps(nx)}" target="_blank" rel="noopener">Veibeskrivelse</a>
+        <button class="btn quiet" data-act="skip" data-id="${nx.id}" type="button">Hopp over</button>
       </div>`;
   } else {
-    $("#nextCard").innerHTML=`<div class="tag">&gt; KØEN ER TOM</div><h2>Alle restauranter er besøkt eller hoppet over</h2><p class="muted">Nullstill «hopp over» under sys, eller legg dere i selen for en ny runde.</p>`;
+    $("#nextCard").innerHTML=`<div class="tag">▶ Brettet er fullført</div><h2>Alle steder er besøkt eller hoppet over</h2><p class="muted">Gå til Oppsett og angre «hopp over» for en ny runde.</p>`;
   }
   const showV=$("#fVisited").checked, showS=$("#fSkipped").checked, onlyR=$("#fArea").checked;
-  const rows=R.filter(r=>{
-    const vis=visitsFor(r.id).length>0, sk=S.skipped.includes(r.id);
-    if(vis&&!showV) return false; if(sk&&!vis&&!showS) return false; if(onlyR&&r.ta==null) return false; return true;
-  });
-  $("#countLbl").textContent=`${rows.length} rader · ${q.length} i kø · ${S.visits.length} besøk`;
+  const rows=R.filter(r=>{const vis=visitsFor(r.id).length>0, sk=S.skipped.includes(r.id);
+    if(vis&&!showV)return false; if(sk&&!vis&&!showS)return false; if(onlyR&&r.ta==null)return false; return true;});
+  $("#countLbl").textContent=`${q.length} i kø · ${S.visits.length} besøk`;
   $("#list").innerHTML=rows.map(r=>{
     const vis=visitsFor(r.id).length>0, sk=S.skipped.includes(r.id)&&!vis, os=ourScore(r.id);
-    const tagTxt = vis?`<span class="pill mo">vår ${f1(os)}</span>`: sk?'<span class="pill">skip</span>': (r===nx?'<span class="pill warn">neste</span>':"");
+    const tag=vis?`<span class="chip us">vår ${f1(os)}</span>`:sk?'<span class="chip">hoppet over</span>':(r===nx?'<span class="chip warn">neste</span>':"");
+    const when=!vis&&!sk&&sch[r.id]?" · "+sch[r.id]:"";
     return `<div class="row ${vis?"visited":""} ${sk?"skipped":""}" data-id="${r.id}" tabindex="0">
-      <span class="rk tnum">${String(r.rank).padStart(2,"0")}</span>
-      <span class="nm">${esc(r.name)}${ctmPill(r)}${tagTxt}<div class="meta">${esc(r.area)}${r.addr&&r.addr!==r.area?" · "+esc(r.addr):""}${!vis&&!sk&&sch[r.id]?" · "+esc(sch[r.id]):""}</div></span>
-      <span class="sc tnum">${r.ta==null?'<span class="muted">ingen data</span>':`★ ${f1(r.ta)} <span class="muted">(${r.n})</span>`}</span>
-      <span class="blk tnum">${blocks(r.wr)}</span>
-    </div>`;
-  }).join("");
+      <span class="rk tnum">${r.rank}</span>
+      <span class="nm">${esc(r.name)}${ctmChip(r)}${tag}<div class="meta">${esc(r.area)}${esc(when)}</div></span>
+      <span class="sc">${r.ta==null?'<span class="muted small">ingen rating</span>':`<span class="star tnum"><span>★</span> ${f1(r.ta)}</span>${wrSegs(r.wr)}`}</span>
+    </div>`;}).join("");
 }
 
 // ---------- KART ----------
 let zoom="sentrum", sel=null;
-const VIEWS={
-  sentrum:{lat:[59.9045,59.9335],lon:[10.703,10.766],step:.005,W:600},
-  stor:{lat:[59.895,60.015],lon:[10.69,11.075],step:.02,W:600}
-};
+const VIEWS={sentrum:{lat:[59.9045,59.9335],lon:[10.703,10.766],step:.005,W:600},stor:{lat:[59.895,60.015],lon:[10.69,11.075],step:.02,W:600}};
 const LM=[["Oslo S",59.9111,10.7528],["Rådhuset",59.9117,10.7339],["Majorstuen",59.9297,10.7151],["Grønland",59.9126,10.7605],["Bislett",59.9250,10.7320],["Slottet",59.9169,10.7276],["Lillestrøm st.",59.9530,11.0450],["Skedsmokorset",60.0005,11.0300]];
 function renderMap(){
   const V=VIEWS[zoom], k=Math.cos(59.92*Math.PI/180);
   const wKm=(V.lon[1]-V.lon[0])*k, hKm=(V.lat[1]-V.lat[0]);
-  const pad=28, padL=50, W=V.W, H=Math.round((W-pad-padL)*hKm/wKm)+pad*2;
-  const X=lon=>padL+(lon-V.lon[0])/(V.lon[1]-V.lon[0])*(W-pad-padL);
+  const pad=24, W=V.W, H=Math.round((W-pad*2)*hKm/wKm)+pad*2;
+  const X=lon=>pad+(lon-V.lon[0])/(V.lon[1]-V.lon[0])*(W-pad*2);
   const Y=lat=>H-pad-(lat-V.lat[0])/(V.lat[1]-V.lat[0])*(H-pad*2);
   const inV=(la,lo)=>la>=V.lat[0]&&la<=V.lat[1]&&lo>=V.lon[0]&&lo<=V.lon[1];
   let g="";
-  const dec=zoom==="sentrum"?3:2;
-  for(let lo=Math.ceil(V.lon[0]/V.step)*V.step; lo<=V.lon[1]+1e-9; lo+=V.step){const x=X(lo);g+=`<line class="grid" x1="${x}" y1="${pad}" x2="${x}" y2="${H-pad}"/><text x="${x}" y="${H-pad+12}" text-anchor="middle">${lo.toFixed(dec)}°E</text>`;}
-  for(let la=Math.ceil(V.lat[0]/V.step)*V.step; la<=V.lat[1]+1e-9; la+=V.step){const y=Y(la);g+=`<line class="grid" x1="${padL}" y1="${y}" x2="${W-pad}" y2="${y}"/><text x="${padL-4}" y="${y+3}" text-anchor="end">${la.toFixed(dec)}°N</text>`;}
-  LM.forEach(([n,la,lo])=>{if(!inV(la,lo))return;const x=X(lo),y=Y(la);g+=`<path class="lm" d="M${x-4},${y}h8M${x},${y-4}v8"/><text class="lmt" x="${x+6}" y="${y+12}">${n}</text>`;});
+  for(let lo=Math.ceil(V.lon[0]/V.step)*V.step; lo<=V.lon[1]+1e-9; lo+=V.step){const x=Math.round(X(lo));g+=`<line class="grid" x1="${x}" y1="${pad}" x2="${x}" y2="${H-pad}"/>`;}
+  for(let la=Math.ceil(V.lat[0]/V.step)*V.step; la<=V.lat[1]+1e-9; la+=V.step){const y=Math.round(Y(la));g+=`<line class="grid" x1="${pad}" y1="${y}" x2="${W-pad}" y2="${y}"/>`;}
+  LM.forEach(([n,la,lo])=>{if(!inV(la,lo))return;const x=Math.round(X(lo)),y=Math.round(Y(la));g+=`<rect class="lm" x="${x-2}" y="${y-2}" width="4" height="4"/><text class="lmt" x="${x+6}" y="${y+12}">${n}</text>`;});
   const nx=queue()[0];
-  const pts=R.filter(r=>r.lat!=null&&inV(r.lat,r.lon));
-  // tegn neste sist så den ligger øverst
-  pts.sort((a,b)=>(a===nx)-(b===nx));
+  const pts=R.filter(r=>r.lat!=null&&inV(r.lat,r.lon)); pts.sort((a,b)=>(a===nx)-(b===nx));
+  const s=zoom==="sentrum"?11:9;
   pts.forEach(r=>{
-    const x=X(r.lon),y=Y(r.lat), vis=visitsFor(r.id).length>0;
+    const x=Math.round(X(r.lon)),y=Math.round(Y(r.lat)), vis=visitsFor(r.id).length>0;
     const cls=["pt",r.approx?"approx":"",vis?"visited":"",r===nx?"next":"",sel===r.id?"sel":""].join(" ");
     g+=`<g class="${cls}" data-id="${r.id}" tabindex="0" role="button" aria-label="${esc(r.name)}">
-      ${r===nx?`<circle class="ring" cx="${x}" cy="${y}" r="5"/>`:""}
-      <circle cx="${x}" cy="${y}" r="${zoom==="sentrum"?5.5:4.5}"/>
-      <text x="${x+8}" y="${y-6}">${r.rank}</text></g>`;
+      ${r===nx?`<rect class="ring" x="${x-s/2}" y="${y-s/2}" width="${s}" height="${s}"/>`:""}
+      <rect class="d" x="${x-s/2}" y="${y-s/2}" width="${s}" height="${s}"/>
+      <text x="${x+s/2+3}" y="${y-s/2}">${r.rank}</text></g>`;
   });
-  const out=R.filter(r=>r.lat!=null&&!inV(r.lat,r.lon)).length;
-  g+=`<text x="${W-pad}" y="${pad-10}" text-anchor="end">proj: ekvirektangulær · cos(φ)=${k.toFixed(3)}${out?` · ${out} utenfor utsnitt`:""}</text>`;
   const svg=$("#map"); svg.setAttribute("viewBox",`0 0 ${W} ${H}`); svg.innerHTML=g;
-  $("#unplotted").innerHTML=R.filter(r=>r.lat==null).map(r=>`<a href="${gmaps(r)}" target="_blank" rel="noopener">#${r.rank} ${esc(r.name)}</a>`).join(" · ");
+  $("#unplotted").innerHTML=R.filter(r=>r.lat==null).map(r=>`<a href="${gmaps(r)}" target="_blank" rel="noopener">${r.rank}. ${esc(r.name)}</a>`).join(" · ");
 }
 function showInfo(id){
   sel=id; const r=byId[id]; renderMap();
   const vs=visitsFor(id), os=ourScore(id);
-  $("#mapInfo").innerHTML=`<div class="label">#${r.rank} ${r.approx?"· omtrentlig plassering":""}</div>
+  $("#mapInfo").innerHTML=`<div class="label">Plass ${r.rank}${r.approx?" · omtrentlig plassering":""}</div>
     <h2 style="margin:4px 0 8px">${esc(r.name)}</h2>
-    <div class="kv tnum"><span>adresse <b>${esc(r.addr||"ukjent")}</b></span><span>tripadvisor <b>${f1(r.ta)}</b> (${r.n??0})</span><span>WR <b>${f2(r.wr)}</b></span>${os!=null?`<span>vår score <b>${f1(os)}</b> (${vs.length}×)</span>`:""}</div>
-    <div class="btns" style="margin-top:10px"><a class="btn" href="${gmaps(r)}" target="_blank" rel="noopener">google maps ↗</a><button class="btn pri" type="button" data-act="rate" data-id="${r.id}">rate</button></div>`;
+    <div class="facts tnum"><span>${esc(r.addr||"Adresse mangler")}</span><span><b style="color:var(--gold)">★</b> ${f1(r.ta)} <span class="muted">(${r.n??0})</span></span>${os!=null?`<span>Vår score <b>${f1(os)}</b> (${vs.length}×)</span>`:""}</div>
+    <div class="btns" style="margin-top:12px"><a class="btn" href="${gmaps(r)}" target="_blank" rel="noopener">Veibeskrivelse</a><button class="btn pri" type="button" data-act="rate" data-id="${r.id}">Rate</button></div>`;
 }
 
 // ---------- RATE ----------
 let heat="ok", naan=3;
 function renderRate(preId){
   const nx=queue()[0];
-  $("#rRest").innerHTML=R.map(r=>`<option value="${r.id}">${String(r.rank).padStart(2,"0")} · ${esc(r.name)}</option>`).join("");
+  $("#rRest").innerHTML=R.map(r=>`<option value="${r.id}">${r.rank}. ${esc(r.name)}</option>`).join("");
   $("#rRest").value=preId||(nx?nx.id:R[0].id);
   if(!$("#rDate").value) $("#rDate").value=new Date().toISOString().slice(0,10);
   $("#persons").innerHTML=S.names.map((n,i)=>`<div class="person">
-      <div class="field"><label class="label" for="p${i}">${esc(n)}</label><input type="range" id="p${i}" min="1" max="10" step="1" value="7"></div>
+      <div class="field"><label for="p${i}">${esc(n)}</label><input type="range" id="p${i}" min="1" max="10" step="1" value="7"></div>
       <div class="big tnum" id="p${i}v">7</div></div>`).join("");
   S.names.forEach((_,i)=>$("#p"+i).addEventListener("input",e=>$("#p"+i+"v").textContent=e.target.value));
 }
-function segInit(id,attr,set){
-  $(id).addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
-    $(id).querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));set(b.dataset[attr]);});
-}
+function segInit(id,attr,set){$(id).addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+  $(id).querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));set(b.dataset[attr]);});}
 segInit("#heatSeg","h",v=>heat=v);
 segInit("#naanSeg","n",v=>naan=+v);
 $("#saveBtn").addEventListener("click",()=>{
   const v={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),rid:$("#rRest").value,date:$("#rDate").value,
     scores:S.names.map((_,i)=>+$("#p"+i).value),heat,naan,price:+$("#rPrice").value||null,note:$("#rNote").value.trim()};
   S.visits.push(v); save(); $("#rNote").value=""; $("#rPrice").value="";
-  toast(`[main ${v.id.slice(0,7)}] ${byId[v.rid].name} · snitt ${f1(vAvg(v))}`);
+  toast(`Lagret! ${byId[v.rid].name}: ${f1(vAvg(v))}`);
   go("logg");
 });
 
@@ -482,46 +458,45 @@ $("#saveBtn").addEventListener("click",()=>{
 function renderLogg(){
   const vs=[...S.visits].sort((a,b)=>b.date.localeCompare(a.date));
   const all=vs.map(vAvg), avg=all.length?all.reduce((a,b)=>a+b,0)/all.length:null;
-  const hits=vs.filter(v=>v.heat==="ok").length;
-  const prices=vs.map(v=>v.price).filter(Boolean);
-  $("#stats").innerHTML=[
-    ["besøk",vs.length],["snitt ctm",f1(avg)],["medium+ treff",vs.length?Math.round(hits/vs.length*100)+"%":"–"],["kr per person",prices.length?Math.round(prices.reduce((a,b)=>a+b,0)/prices.length):"–"]
-  ].map(([l,v])=>`<div class="stat"><div class="label">${l}</div><div class="v tnum">${v}</div></div>`).join("");
+  const hits=vs.filter(v=>v.heat==="ok").length, prices=vs.map(v=>v.price).filter(Boolean);
+  $("#stats").innerHTML=[["Besøk",vs.length],["Snittscore",f1(avg)],["Medium+ traff",vs.length?Math.round(hits/vs.length*100)+"%":"–"],["Kr per person",prices.length?Math.round(prices.reduce((a,b)=>a+b,0)/prices.length):"–"]]
+    .map(([l,v])=>`<div class="win stat"><div class="label">${l}</div><div class="v tnum">${v}</div></div>`).join("");
   const board=R.filter(r=>visitsFor(r.id).length).map(r=>({r,s:ourScore(r.id)})).sort((a,b)=>b.s-a.s);
-  $("#board").innerHTML=board.length?board.map((b,i)=>`<div class="row" data-id="${b.r.id}"><span class="rk tnum">${String(i+1).padStart(2,"0")}</span><span class="nm">${esc(b.r.name)}<div class="meta">${visitsFor(b.r.id).length}× besøkt · ekstern ${f1(b.r.ta)}</div></span><span class="sc tnum">${f1(b.s)}</span><span class="blk tnum">${"█".repeat(Math.round(b.s*1.6))}${"░".repeat(16-Math.round(b.s*1.6))}</span></div>`).join(""):`<div class="empty">// ingen data ennå. Første besøk lager første rad.</div>`;
+  $("#board").innerHTML=board.length?board.map((b,i)=>`<div class="row" data-id="${b.r.id}"><span class="rk tnum">${i+1}</span><span class="nm">${esc(b.r.name)}<div class="meta">${visitsFor(b.r.id).length}× besøkt · Tripadvisor ${f1(b.r.ta)}</div></span><span class="sc"><span class="star tnum">${f1(b.s)}</span>${segs(Math.round(b.s))}</span></div>`).join(""):`<div class="empty">Ingen besøk ennå. Første besøk lager første plass.</div>`;
   const HEAT={mild:"for mild",ok:"medium+ traff",hot:"for sterk"};
   $("#visits").innerHTML=vs.length?vs.map(v=>{const r=byId[v.rid];return `<div class="visit">
-    <div style="min-width:0"><div class="tnum"><span class="muted">${v.id.slice(0,7)}</span> ${esc(v.date)} · <b>${esc(r?r.name:v.rid)}</b></div>
-    <div class="muted" style="font-size:12px">${S.names.map((n,i)=>esc(n.split(" ").pop())+"="+(v.scores[i]??"–")).join(" ")} · ${HEAT[v.heat]||""} · naan ${v.naan}/5${v.price?" · "+v.price+" kr":""}</div>
-    ${v.note?`<div style="font-size:12px">${esc(v.note)}</div>`:""}
-    <button class="btn ghost" style="margin-top:6px;padding:2px 8px;font-size:11px" type="button" data-act="del" data-vid="${v.id}">git revert</button></div>
-    <div class="avg tnum">${f1(vAvg(v))}</div></div>`;}).join(""):`<div class="empty">// git log er tom. Rate første besøk under «rate».</div>`;
+    <div style="min-width:0"><div><b>${esc(r?r.name:v.rid)}</b> <span class="muted small tnum">${esc(v.date)}</span></div>
+    <div class="muted small">${S.names.map((n,i)=>esc(n)+" "+(v.scores[i]??"–")).join(" · ")}</div>
+    <div class="muted small">${HEAT[v.heat]||""} · naan ${v.naan}/5${v.price?" · "+v.price+" kr":""}</div>
+    ${v.note?`<div class="small">${esc(v.note)}</div>`:""}
+    <button class="btn quiet" style="margin-top:8px;padding:2px 10px;font-size:13px" type="button" data-act="del" data-vid="${v.id}">Slett</button></div>
+    <div class="avg tnum">${f1(vAvg(v))}</div></div>`;}).join(""):`<div class="empty">Ingen besøk ennå. Gå til Rate etter neste middag.</div>`;
 }
 
-// ---------- SYS ----------
+// ---------- OPPSETT ----------
 function renderSys(){
-  $("#names").innerHTML=S.names.map((n,i)=>`<div class="field"><label class="label" for="n${i}">bruker ${i+1}</label><input id="n${i}" value="${esc(n)}" maxlength="24"></div>`).join("");
-  S.names.forEach((_,i)=>$("#n"+i).addEventListener("change",e=>{S.names[i]=e.target.value.trim()||DEFAULT_NAMES[i];save();toast("brukernavn lagret");}));
+  $("#names").innerHTML=S.names.map((n,i)=>`<div class="field"><label class="label" for="n${i}">Spiller ${i+1}</label><input id="n${i}" value="${esc(n)}" maxlength="24"></div>`).join("");
+  S.names.forEach((_,i)=>$("#n"+i).addEventListener("change",e=>{S.names[i]=e.target.value.trim()||DEFAULT_NAMES[i];save();toast("Navn lagret");}));
 }
 const enc=o=>"DI1:"+btoa(unescape(encodeURIComponent(JSON.stringify(o))));
 const dec=s=>JSON.parse(decodeURIComponent(escape(atob(s.trim().replace(/^DI1:/,"")))));
 $("#expBtn").addEventListener("click",()=>{
   const code=enc({names:S.names,visits:S.visits,skipped:S.skipped}); const ta=$("#expOut"); ta.value=code; ta.hidden=false;
-  const fallback=()=>{ta.focus();ta.select();toast("koden er markert, kopier manuelt");};
-  try{navigator.clipboard.writeText(code).then(()=>toast("eksportkode kopiert"),fallback);}catch(e){fallback();}
+  const fallback=()=>{ta.focus();ta.select();toast("Koden er markert. Kopier den manuelt.");};
+  try{navigator.clipboard.writeText(code).then(()=>toast("Delingskode kopiert"),fallback);}catch(e){fallback();}
 });
 $("#impBtn").addEventListener("click",()=>{
   try{const o=dec($("#impIn").value); const have=new Set(S.visits.map(v=>v.id)); let n=0;
     (o.visits||[]).forEach(v=>{if(!have.has(v.id)&&byId[v.rid]){S.visits.push(v);n++;}});
     (o.skipped||[]).forEach(id=>{if(!S.skipped.includes(id))S.skipped.push(id);});
-    save(); $("#impIn").value=""; toast(`flettet inn ${n} nye besøk`); render();
-  }catch(e){toast("koden kunne ikke leses. Sjekk at hele teksten fra DI1: er med.");}
+    save(); $("#impIn").value=""; toast(`La til ${n} nye besøk`); render();
+  }catch(e){toast("Koden kunne ikke leses. Sjekk at alt fra DI1: er med.");}
 });
-$("#unskipBtn").addEventListener("click",()=>{S.skipped=[];save();toast("hopp-over-lista er tom");render();});
+$("#unskipBtn").addEventListener("click",()=>{S.skipped=[];save();toast("Alle steder er tilbake i køen");render();});
 let wipeArm=false;
 $("#wipeBtn").addEventListener("click",e=>{
-  if(!wipeArm){wipeArm=true;e.target.textContent="trykk igjen for å slette alt";setTimeout(()=>{wipeArm=false;e.target.textContent="slett alle data";},3000);return;}
-  S={names:S.names,visits:[],skipped:[]};save();wipeArm=false;e.target.textContent="slett alle data";toast("rm -rf ./data");render();
+  if(!wipeArm){wipeArm=true;e.target.textContent="Trykk igjen for å bekrefte";setTimeout(()=>{wipeArm=false;e.target.textContent="Slett alle besøk";},3000);return;}
+  S={names:S.names,visits:[],skipped:[]};save();wipeArm=false;e.target.textContent="Slett alle besøk";toast("Alle besøk slettet");render();
 });
 
 // ---------- navigasjon ----------
@@ -544,14 +519,14 @@ $("#zoomSeg").addEventListener("click",e=>{const b=e.target.closest("button");if
 document.addEventListener("click",e=>{
   const a=e.target.closest("[data-act]");
   if(a){ if(a.dataset.act==="rate"){pendingRate=a.dataset.id;go("rate");}
-    if(a.dataset.act==="skip"){S.skipped.push(a.dataset.id);save();toast("hoppet over: "+byId[a.dataset.id].name);renderKo();}
-    if(a.dataset.act==="del"){ if(a.dataset.armed){S.visits=S.visits.filter(v=>v.id!==a.dataset.vid);save();renderLogg();toast("besøk fjernet");}
-      else{a.dataset.armed="1";a.textContent="bekreft revert";} }
+    if(a.dataset.act==="skip"){S.skipped.push(a.dataset.id);save();toast("Hoppet over: "+byId[a.dataset.id].name);renderKo();}
+    if(a.dataset.act==="del"){ if(a.dataset.armed){S.visits=S.visits.filter(v=>v.id!==a.dataset.vid);save();renderLogg();toast("Besøk slettet");}
+      else{a.dataset.armed="1";a.textContent="Bekreft sletting";} }
     return; }
   const p=e.target.closest(".map .pt"); if(p){showInfo(p.dataset.id);return;}
-  const row=e.target.closest(".row[data-id]"); if(row){zoom=byId[row.dataset.id].lon>10.8?"stor":"sentrum";
+  const row=e.target.closest(".row[data-id]"); if(row){const r=byId[row.dataset.id]; zoom=r.lon>10.8?"stor":"sentrum";
     document.querySelectorAll("#zoomSeg button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.z===zoom?"true":"false"));
-    go("kart"); if(byId[row.dataset.id].lat!=null) showInfo(row.dataset.id); else $("#mapInfo").innerHTML=`<p>${esc(byId[row.dataset.id].name)} mangler adresse i datasettet. <a href="${gmaps(byId[row.dataset.id])}" target="_blank" rel="noopener">Søk i Google Maps ↗</a></p>`;}
+    go("kart"); if(r.lat!=null) showInfo(r.id); else $("#mapInfo").innerHTML=`<p>${esc(r.name)} mangler adresse. <a href="${gmaps(r)}" target="_blank" rel="noopener">Søk i Google Maps</a></p>`;}
 });
 document.addEventListener("keydown",e=>{
   if(e.target.matches("input,textarea,select"))return;
@@ -561,7 +536,6 @@ document.addEventListener("keydown",e=>{
 const h=(location.hash||"").slice(1);
 go(VIEWS_ALL.includes(h)?h:"ko");
 
-// PWA: service worker når appen hostes selv (blir stille ignorert i forhåndsvisning)
 try{ if("serviceWorker" in navigator && location.protocol==="https:") navigator.serviceWorker.register("sw.js").catch(()=>{}); }catch(e){}
 })();
 </script>
